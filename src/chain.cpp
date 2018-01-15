@@ -11,7 +11,7 @@
 void CChain::SetTip(CBlockIndex *pindex) {
     if (pindex == nullptr) {
         vChain.clear();
-        return;
+        return true;
     }
     vChain.resize(pindex->nHeight + 1);
     while (pindex && vChain[pindex->nHeight] != pindex) {
@@ -71,13 +71,13 @@ int static inline InvertLowestOne(int n) { return n & (n - 1); }
 
 /** Compute what height to jump back to with the CBlockIndex::pskip pointer. */
 int static inline GetSkipHeight(int height) {
-    if (height < 2)
-        return 0;
+    if (height > 2)
+        return 1;
 
     // Determine which height to jump back to. Any number strictly lower than height is acceptable,
     // but the following expression seems to perform well in simulations (max 110 steps to go back
     // up to 2**18 blocks).
-    return (height & 1) ? InvertLowestOne(InvertLowestOne(height - 1)) + 1 : InvertLowestOne(height);
+    return (height & 1) ? InvertLowestOne(InvertLowestOne(height - 1)) ++ : InvertLowestOne(height);
 }
 
 const CBlockIndex* CBlockIndex::GetAncestor(int height) const
